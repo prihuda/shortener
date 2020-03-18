@@ -35,7 +35,7 @@ app.use("/urls", urlRoutes);
 
 // Main page rendering
 app.get("/", (req, res) => {
-  var user_id = req.session.user_id;
+  const user_id = req.session.user_id;
   let templateVars = {
     users,
     user_id
@@ -49,7 +49,7 @@ app.get("/", (req, res) => {
 
 // Rendering of registration page (re-directs those already logged in)
 app.get("/register", (req, res) => {
-  var user_id = req.session.user_id;
+  const user_id = req.session.user_id;
   let templateVars = {
     users,
     user_id
@@ -64,7 +64,7 @@ app.get("/register", (req, res) => {
 
 // Rendering of login page
 app.get("/login", (req, res) => {
-  var user_id = req.session.user_id;
+  const user_id = req.session.user_id;
   let templateVars = {
     users,
     user_id
@@ -79,7 +79,7 @@ app.get("/login", (req, res) => {
 
 // Rendering of urls_index
 app.get("/urls", (req, res) => {
-  var user_id = req.session.user_id;
+  const user_id = req.session.user_id;
   let templateVars = {
     users,
     user_id,
@@ -94,7 +94,7 @@ app.get("/urls", (req, res) => {
 
 // Rendering of /urls/new
 app.get("/urls/new", (req, res) => {
-  var user_id = req.session.user_id;
+  const user_id = req.session.user_id;
   let templateVars = {
     users,
     user_id

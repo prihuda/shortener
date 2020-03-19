@@ -5,6 +5,7 @@ const uRoutes           = express.Router();
 const methodOverride    = require('method-override')
 const { Url, Visitor }	= require('../models');
 const { to, ReE, ReS }  = require('../services/util.service');
+const protocolChecker = require("../lib/protocolChecker");
 
 // Short-link redirection
 uRoutes.get("/:shortURL", async (req, res) => {

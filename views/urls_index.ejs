@@ -18,14 +18,14 @@
                 <%= urls[key]["url"] %>
               </td>
               <td>
-                <a href="/u/<%= [key] %>" target="_blank"><%= [key] %></a>
+                <a href="/u/<%= urls[key]["short_url"] %>" target="_blank"><%= urls[key]["short_url"] %></a>
               </td>
               <td>
-                <a href="/urls/<%= [key] %>">
+                <a href="/urls/<%= urls[key]["short_url"] %>">
                 <button type="submit" class="btn btn-primary">Edit</button></a>
               </td>
               <td>
-                <form method="POST" action="/urls/<%= [key] %>?_method=DELETE">
+                <form method="POST" action="/urls/<%= urls[key]["short_url"] %>?_method=DELETE">
                   <input type="submit" class="btn btn-danger" value="Delete" />
                 </form>
               </td>

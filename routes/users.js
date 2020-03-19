@@ -1,63 +1,59 @@
 "use strict";
 
-const express       = require('express');
-const userRoutes    = express.Router();
-const bcrypt        = require('bcrypt');
-const randomizer    = require("../lib/randomizer");
+const express			= require('express');
+const userRoutes	= express.Router();
+const authService	= require('../services/auth.service');
+const { to }  		= require('../services/util.service');
 
-module.exports = function(users, urlDatabase) {
+userRoutes.post("/register", async (req, res) => {
+	let { email, password } = req.body;
 
-  userRoutes.post("/register", (req, res) => {
-    let { email, password } = req.body;
-    // Conditional checks for email
-    if (email.length <= 5) {
-      req.flash('danger', "Please provide a valid email.");
-      res.redirect("/register")
-    };
-    for (key in users) {
-      if (users[key].email === email) {
-        req.flash('warning', "This email is already associated with an account in our system. Please register with a different one.");
-        res.redirect("/register")
-      };
-    };
-    // Conditional checks for password
-    if (!password) {
-      req.flash('danger', "Please provide a password.");
-      res.redirect("/register")
-    };
-    // Creating new user
-    let user_id = randomizer();
-    req.session.user_id = user_id;
-    users[user_id] = {id: user_id, email: email, password: bcrypt.hashSync(password, 10) };
-    urlDatabase[user_id] = {};
-    req.flash('success', "Your account has been successfully created. Add a new URL above to get started!");
-    res.redirect("/urls");
-  });
+	if (!email) {
+		req.flash('danger', "Please provide a valid email.");
+		return res.redirect("/register");
+	}
 
-  // Login form data
-  userRoutes.post("/login", (req, res) => {
-    let userFound = false;
-    let { email, password } = req.body;
-    for (key in users) {
-      if (users[key].email === email) {
-        if (bcrypt.compareSync(password, users[key].password)) {
-          userFound = true;
-          req.session.user_id = users[key].id;
-          res.redirect("/urls");
-        }
-      }
-    }
-    if (!userFound) {
-      req.flash('danger', "Please check your username and/or password.");
-      return res.redirect("/login");
-    }
-  });
+	if (!password) {
+		req.flash('danger', "Please provide a password.");
+		return res.redirect("/register");
+	}
 
-  userRoutes.post("/logout", (req, res) => {
-    req.session = null;
-    res.redirect("/");
-  });
+	let err, user;
+	[err, user] = await to(authService.createUser(req.body)).catch(e => { err = e; });
+	if (err) {
+		req.flash('danger', err.message);
+		return res.redirect("/register")
+	}
+	
+	let data = user.toWeb();
+	req.session.token = user.getJWT();
+	req.session.user_id = data.id;
+	req.session.email = data.email;
+	req.flash('success', "Your account has been successfully created. Add a new URL above to get started!");
+	res.redirect("../urls");
+});
 
-  return userRoutes;
+// Login form data
+userRoutes.post("/login", async (req, res) => {
+	let userFound = false;
+	let { email, password } = req.body;
+	let err, user;
 
-};
+	[err, user] = await to(authService.authUser(req.body));
+	if (err) {
+		req.flash('danger', "Please check your username and/or password.");
+		return res.redirect("/login");
+	}
+	let data = user.toWeb();
+	req.session.token = user.getJWT();
+	req.session.user_id = data.id;
+	req.session.email = data.email;
+	res.redirect("/urls");
+});
+
+userRoutes.post("/logout", (req, res) => {
+	req.session = null;
+	res.redirect("/");
+});
+
+module.exports = userRoutes;

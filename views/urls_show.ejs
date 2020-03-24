@@ -19,20 +19,25 @@
     <br>
     <div class="container">
       <h4>Visitor Log</h4>
-      <table>
+      <table class="table table-condensed">
+				<thead>
+					<tr>
+						<th>No.</th>
+						<th>IP Address</th>
+						<th>Referrer URL</th>
+						<th>Date Visited</th>
+					</tr>
+				</thead>
       <% for (i in visitors) { %>
-        <tr>
-          <td style="padding-top: 10px;">
-            <b>user_id:</b> <%= i %>
-          </td>
-        </tr>
-          <% for (k in i) { %>
-            <tr>
-            <td>
-            <%= visitors[i][k] %>
-          </td>
-        </tr>
-          <% } %>
+				<tbody>
+					<tr>
+						<td><%= 1+parseInt(i) %></td>
+						<td><%= visitors[i].ip_address %></td>
+						<td><%= visitors[i].referrer_url %></td>
+						<td><%= visitors[i].createdAt %></td>
+					</tr>
+				</tbody>
+          
       <% } %>
   </table>
     </div>

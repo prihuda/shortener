@@ -1,10 +1,8 @@
 'use strict';
 
-const uuid = require('uuid/v4');
-
 module.exports = (sequelize, DataTypes) => {
 	var Model = sequelize.define('Visitor', {
-		uuid        : {type: DataTypes.UUID, defaultValue: uuid(), primaryKey: true},
+		uuid        : {type: DataTypes.UUID, primaryKey: true},
 		ip_address  : {type: DataTypes.TEXT},
 		referrer_url: {type: DataTypes.TEXT}
 	}, {

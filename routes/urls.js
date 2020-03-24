@@ -3,8 +3,7 @@
 const express           = require('express');
 const urlRoutes         = express.Router();
 const methodOverride    = require('method-override')
-//const { User }          = require('../models');
-const { Url }          = require('../models');
+const { Url, Visitor }  = require('../models');
 const authService       = require('../services/auth.service');
 const { to, ReE, ReS }  = require('../services/util.service');
 const randomizer        = require("../lib/randomizer");
@@ -63,6 +62,10 @@ urlRoutes.post("/new", authenticate, async (req, res) => {
 	};
 	
 	[err, url] = await to(Url.create(urlInfo));
+	if (err) {
+		req.flash('danger', err.message);
+		res.redirect("new");
+	};
 	
 	return res.redirect("/urls/" + url.short_url);
 });
@@ -78,15 +81,34 @@ urlRoutes.get("/:id", authenticate, async (req, res) => {
 			short_url: id
 		}
 	}));
+	if (err) { console.log(err.message) }
+	
+	let count, distinct, visitors;
+	
+	[err, count]    = await to(url.countVisitors());
+	if (err) { console.log(err.message) }
+	
+	[err, distinct] = await to(Visitor.count({
+		distinct: true,
+		col: 'ip_address'
+	}));
+	if (err) { console.log(err.message) }
+	
+	[err, visitors] = await to(Visitor.findAll({
+		where: {
+			UrlId: url['id']
+		}
+	}));
+	if (err) { console.log(err.message) }
 	let templateVars = {
 		email,
 		user_id,
 		shortURL: url["short_url"],
 		longURL: url["url"],
 		date: url["createdAt"],
-		clickthroughs:  url["clickthroughs"],
-		uniqueClickthroughs:  url["createdAt"],
-		visitors:  url["createdAt"]
+		clickthroughs: count,
+		uniqueClickthroughs: distinct,
+		visitors:  visitors
 	}
 	res.render("urls_show", templateVars);
 	return;

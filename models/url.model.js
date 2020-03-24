@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
 	});
 
 	Model.associate = function(models){
-		this.User = this.belongsTo(models.User);
+		this.User    = this.belongsTo(models.User);
+		this.Visitor = this.hasMany(models.Visitor);
 	};
 
 	Model.prototype.toWeb = function (pw) {

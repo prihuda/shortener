@@ -2,10 +2,10 @@
 
 const express           = require('express');
 const uRoutes           = express.Router();
-const methodOverride    = require('method-override')
+const methodOverride    = require('method-override');
+const uuid 							= require('uuid/v4');
 const { Url, Visitor }	= require('../models');
 const { to, ReE, ReS }  = require('../services/util.service');
-const protocolChecker = require("../lib/protocolChecker");
 
 // Short-link redirection
 uRoutes.get("/:shortURL", async (req, res) => {
@@ -25,18 +25,18 @@ uRoutes.get("/:shortURL", async (req, res) => {
 	let ip = (req.headers['x-forwarded-for'] || '').split(',')[0] || 
 					  req.connection.remoteAddress || 
 					  req.socket.remoteAddress || 
-					  req.connection.socket.remoteAddress || '';
-	
+					  req.connection.socket.remoteAddress || '';	
 	let data = {
+		uuid: uuid(),
 		UrlId: url['id'],
 		ip_address: ip,
 		referrer_url: req.headers.referrer || req.headers.referer
 	};
 	
-	[err, url] = await to(Visitor.create(data));
-	if (err) { console.log(err) }
+	Visitor.create(data)
+		.catch(error => console.log('Error:', error));
 	
-	res.redirect('//'+ target);
+	res.redirect(target);
 	return;
 });
 	

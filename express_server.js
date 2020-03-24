@@ -37,11 +37,11 @@ models.sequelize.authenticate().then(() => {
 });
 
 if (CONFIG.app==='dev') {
-	//creates table if they do not already exist
-	models.sequelize.sync();
-	
-	//deletes all tables then recreates them useful for testing and development purposes
-	//models.sequelize.sync({ force: true });
+  //creates table if they do not already exist
+  //models.sequelize.sync();
+
+  //deletes all tables then recreates them useful for testing and development purposes
+  models.sequelize.sync({ force: true });
 }
 
 
